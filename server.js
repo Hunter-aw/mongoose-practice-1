@@ -14,7 +14,9 @@ var Person = require("./models/PersonModel")
 
 mongoose.connect("mongodb://localhost/mongoose-practice")
 
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.urlencoded({
+  extended: false
+}))
 app.use(bodyParser.json())
 
 
@@ -37,7 +39,7 @@ console.log("done");
 
 function loadFromAPI(apiURL) {
 
-  request(apiURL, function(error, response, body) {
+  request(apiURL, function (error, response, body) {
 
     var result = JSON.parse(body)
 
@@ -53,7 +55,9 @@ function loadFromAPI(apiURL) {
       })
 
       //Only save if the book doesn't exist yet
-      Book.findOne({ title: book.title }, function(err, foundBook) {
+      Book.findOne({
+        title: book.title
+      }, function (err, foundBook) {
         if (!foundBook) {
           book.save()
         }
@@ -67,27 +71,27 @@ function loadFromAPI(apiURL) {
 Create People Collection
 =======================================================*/
 var colors = ["brown", "black", "red", "yellow", "green", "grey"]
-var getColor = function() {
+var getColor = function () {
   return colors[Math.floor(Math.random() * colors.length)]
 }
-var getWeight = function() {
+var getWeight = function () {
   return getRandIntBetween(50, 120)
 }
-var getHeight = function() {
+var getHeight = function () {
   return getRandIntBetween(120, 230)
 }
-var getSalary = function() {
+var getSalary = function () {
   return getRandIntBetween(20000, 50000)
 }
-var getNumKids = function() {
+var getNumKids = function () {
   return Math.floor(Math.random() * 3)
 }
 
-var getRandIntBetween = function(min, max) {
+var getRandIntBetween = function (min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min)
 }
 
-var getKids = function(numKids) {
+var getKids = function (numKids) {
   var kids = [];
   for (var i = 0; i < numKids; i++) {
     kids.push({
@@ -109,7 +113,7 @@ adds new people and their kids until you do have 100
 try to understand how this code works
 could you write it differently?
 =======================================================*/
-Person.find({}).count(function(err, count) {
+Person.find({}).count(function (err, count) {
   // the below two loops could be changed to a simple:
   // for (var i = count; i < 100; i++) {}
   if (count < 100) {
@@ -134,7 +138,7 @@ Person.find({}).count(function(err, count) {
 Start the server:
 =======================================================*/
 
-app.listen(3000, function() {
+app.listen(3000, function () {
   console.log("Server up and running on port 3000")
 })
 
@@ -147,20 +151,124 @@ and your server is running do the following:
 /*Books
 ----------------------*/
 //1. Find books with fewer than 500 but more than 200 pages
-
+Book.find({
+  pages: {
+    $lt: 500,
+    $gt: 200
+  }
+}, function (error, result) {
+  if (error) {
+    return console.error(error)
+  }
+  console.log(result)
+})
 //2. Find books whose rating is less than 5, and sort by the author's name
-
+Book.find({
+  rating: {
+    $lt: 5
+  }
+}, function (error, result) {
+  if (error) {
+    return console.error(error)
+  }
+  console.log(result)
+}).sort('author')
 //3. Find all the Fiction books, skip the first 2, and display only 3 of them 
-
+Book.find({
+  genres: "Fiction"
+}, null,
+{
+  skip:2
+},
+function (error, result) {
+  if (error) {
+    return console.error(error)
+  }
+  console.log(result)
+}).limit(2)
 
 /*People
 ----------------------*/
-//1. Find all the people who are tall (>180) AND rich (>30000)
-
+// 1. Find all the people who are tall (>180) AND rich (>30000)
+Person.find({
+  height: {
+    $gt: 180
+  },
+  salary: {
+    $gt: 30000
+  }},
+  function (error, result) {
+    if (error) {
+      return console.error(error)
+    }
+    console.log(result)
+  }
+)
 //2. Find all the people who are tall (>180) OR rich (>30000)
-
+Person.find({
+    $or: [{
+        height: {
+          $gt: 180
+        }
+      },
+      {
+        salary: {
+          $gt: 30000
+        }
+      }
+    ]
+  },
+  function (error, result) {
+    if (error) {
+      return console.error(error)
+    }
+    console.log(result)
+  }
+)
 //3. Find all the people who have grey hair or eyes, and are skinny (<70)
-
+Person.find({
+    $or: [{
+        hair: "grey"
+      },
+      {
+        eyes: "grey"
+      }
+    ],
+    weight: {$lt: 70}
+  },
+  function (error, result) {
+    if (error) {
+      return console.error(error)
+    }
+    console.log(result)
+  }
+)
 //4. Find people who have at least 1 kid with grey hair
-
+Person.find({
+    numKids: {
+      $gt: 0
+    },
+    'kids.hair': "grey"
+  },
+  function (error, result) {
+    if (error) {
+      return console.error(error)
+    }
+    console.log(result)
+  }
+)
 //5. Find all the people who have at least one overweight kid, and are overweight themselves (>100)
+Person.find({
+    weight: {
+      $gt: 100
+    },
+    'kids.weight': {
+      $gt: 100
+    }
+  },
+  function (error, result) {
+    if (error) {
+      return console.error(error)
+    }
+    console.log(result)
+  })
