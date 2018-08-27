@@ -94,33 +94,46 @@ let meesh = new Visitor({
 // meesh.visitedPlanets.push(uranus)
 // meesh.save()
 
-// Visitor.find({
+// Visitor.findOne({
 //     name: "Jona"
-// }).populate('visitedPlanets').exec((err, planets) => {
+// }).populate('visitedPlanets', 'name -_id').exec((err, visitor) => {
 //     if (err) console.log(err);
-//     else console.log(planets[0])
+//     else console.log(`Jona has visited ${visitor.visitedPlanets[0].name} and ${visitor.visitedPlanets[1].name}`)
 // })
 
-// Planet.find({
+// Planet.findOne({
 //     name: "Pluto"
-// }).populate('visitors', "name -_id").exec((err, visitors) => {
+// }).populate('visitors', "name -_id").exec((err, planet) => {
 //     if (err) console.log(err);
-//     else console.log(visitors[0])
+//     else console.log(`${planet.visitors[0].name} and ${planet.visitors[1].name} are currently visiting Pluto`)
 // })
 
 
-// SolarSystem.findOne({}, (err, system) => {
-//     system.populate({
-//             path: 'planets',
-//             populate: {
-//                 path: ('visitors')
-//             }
-//         },
-//         () => {
-//             console.log(system.planets)
-//         }
-//     )
-// })
+SolarSystem.findOne({}, (err, system) => {
+    system.populate({
+            path: 'planets',
+            populate: {
+                path: 'visitors'
+            }
+        },
+        () => {
+            let uniqueVisitors = []
+            let message = ""
+            let planets = system.planets
+            for (planet of planets) {
+                let visitors = planet.visitors
+                for (visitor of visitors) {
+                    if (uniqueVisitors.indexOf(visitor.name)) {
+                        uniqueVisitors.push(visitor.name)
+                        message += (visitor.name + ", ")
+                    }
+                } 
+            } 
+            message += "are visiting the Milky Way"
+            console.log(message)
+        }
+    )
+})
 
 // Visitor.findOne({name: 'Hunter'}).populate({
 //     path: 'homePlanet',
@@ -129,12 +142,12 @@ let meesh = new Visitor({
 //     }
 // }).exec((err, visitor) => {
 //     if(err) throw err;
-//     else console.log(visitor.homePlanet.system.starName)
+//     else console.log(`The Star in the system of hunter's home planet is the ${visitor.homePlanet.system.starName}`)
 // })
 
-Planet.findOne({
-    name: 'Saturn'
-}).populate('system visitors').exec((err, planet) => {
-    if (err) throw err;
-    else console.log(`Saturn's star is ${planet.system.starName} and ${planet.visitors[0].name} is currently on saturn`)
-})
+// Planet.findOne({
+//     name: 'Saturn'
+// }).populate('system visitors').exec((err, planet) => {
+//     if (err) throw err;
+//     else console.log(`Saturn's star is ${planet.system.starName} and ${planet.visitors[0].name} is currently on saturn`)
+// })
