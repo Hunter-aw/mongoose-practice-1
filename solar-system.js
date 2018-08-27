@@ -104,61 +104,61 @@ let meesh = new Visitor({
 
 //                                   Find a visitor's list of visited planets
 
-// Visitor.findOne({
-//     name: "Jona"
-// }).populate('visitedPlanets', 'name -_id').exec((err, visitor) => {
-//     if (err) console.log(err);
-//     else console.log(`Jona has visited ${visitor.visitedPlanets[0].name} and ${visitor.visitedPlanets[1].name}`)
-// })
+Visitor.findOne({
+    name: "Jona"
+}).populate('visitedPlanets', 'name -_id').exec((err, visitor) => {
+    if (err) console.log(err);
+    else console.log(`Jona has visited ${visitor.visitedPlanets[0].name} and ${visitor.visitedPlanets[1].name}`)
+})
 
 //                                    Find all the visitors on a planet
 
-// Planet.findOne({
-//     name: "Pluto"
-// }).populate('visitors', "name -_id").exec((err, planet) => {
-//     if (err) console.log(err);
-//     else console.log(`${planet.visitors[0].name} and ${planet.visitors[1].name} are currently visiting Pluto`)
-// })
+Planet.findOne({
+    name: "Pluto"
+}).populate('visitors', "name -_id").exec((err, planet) => {
+    if (err) console.log(err);
+    else console.log(`${planet.visitors[0].name} and ${planet.visitors[1].name} are currently visiting Pluto`)
+})
 
 //                                   Find all the visitors in a system (subdocuments!)
 
-// SolarSystem.findOne({}, (err, system) => {
-//     system.populate({
-//             path: 'planets',
-//             populate: {
-//                 path: 'visitors'
-//             }
-//         },
-//         () => {
-//             let uniqueVisitors = []
-//             let message = ""
-//             let planets = system.planets
-//             for (planet of planets) {
-//                 let visitors = planet.visitors
-//                 for (visitor of visitors) {
-//                     if (uniqueVisitors.indexOf(visitor.name)) {
-//                         uniqueVisitors.push(visitor.name)
-//                         message += (visitor.name + ", ")
-//                     }
-//                 } 
-//             } 
-//             message += "are visiting the Milky Way"
-//             console.log(message)
-//         }
-//     )
-// })
+SolarSystem.findOne({}, (err, system) => {
+    system.populate({
+            path: 'planets',
+            populate: {
+                path: 'visitors'
+            }
+        },
+        () => {
+            let uniqueVisitors = []
+            let message = ""
+            let planets = system.planets
+            for (planet of planets) {
+                let visitors = planet.visitors
+                for (visitor of visitors) {
+                    if (uniqueVisitors.indexOf(visitor.name)) {
+                        uniqueVisitors.push(visitor.name)
+                        message += (visitor.name + ", ")
+                    }
+                } 
+            } 
+            message += "are visiting the Milky Way"
+            console.log(message)
+        }
+    )
+})
 
 //                                 Find the name of the star in the system of a visitor's home planet
 
-// Visitor.findOne({name: 'Hunter'}).populate({
-//     path: 'homePlanet',
-//     populate: {
-//         path: 'system'
-//     }
-// }).exec((err, visitor) => {
-//     if(err) throw err;
-//     else console.log(`The Star in the system of hunter's home planet is the ${visitor.homePlanet.system.starName}`)
-// })
+Visitor.findOne({name: 'Hunter'}).populate({
+    path: 'homePlanet',
+    populate: {
+        path: 'system'
+    }
+}).exec((err, visitor) => {
+    if(err) throw err;
+    else console.log(`The Star in the system of hunter's home planet is the ${visitor.homePlanet.system.starName}`)
+})
 
 //                                    Find a planet's system's star name as well as its visitors
 
